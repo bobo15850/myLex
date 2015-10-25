@@ -12,5 +12,4 @@ public class Operator {
 	//
 	public static final char ε = 'ε';// 表示"哎补习咯"
 	public static final char ignore = '/';// 表示注释
-
 }
