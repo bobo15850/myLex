@@ -13,6 +13,6 @@ public class REsHandler_test {
 		REsHandler handler = new REsHandler(path);
 		String targetRE = handler.getTargetRE();
 		System.out.println(targetRE);
-		assertEquals(handler.getTargetRE(), "(((a|b)|¦Å)(aa*))|((aa*)(b|¦Å))");
+		assertEquals(handler.getTargetRE(), "(((a|b)|¦Å).(a.a*))|((a.a*).(b|¦Å))");
 	}
 }

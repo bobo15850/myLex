@@ -1,5 +1,7 @@
 package _02_NFA_hander;
 
+import java.util.Stack;
+
 import common.NotFoundREsException;
 
 public class REs_to_NFA {
@@ -11,4 +13,12 @@ public class REs_to_NFA {
 			throw new NotFoundREsException();
 		}
 	}
+
+	private String inOrderToPosOrder() {
+		Stack<Character> stack = new Stack<Character>();
+		for (int i = 0; i < this.RE.length(); i++) {
+			char ch = this.RE.charAt(i);
+		}
+		return null;
+	}// 将中缀表达式转化为后缀表达式
 }

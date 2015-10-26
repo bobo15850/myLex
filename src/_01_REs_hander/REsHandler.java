@@ -62,15 +62,10 @@ public class REsHandler {
 		try {
 			String temp = null;
 			while ((temp = br.readLine()) != null) {
-				if (temp.trim().length() >= 2) {
-					if (!(temp.charAt(0) == Operator.ignore && temp.charAt(1) == Operator.ignore)) {
-						REsList.add(temp);
-					}
-				}
-				else {
+				if (temp.length() > 0) {
 					REsList.add(temp);
 				}
-			}
+			}//
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;// 文件打开错误
@@ -92,8 +87,39 @@ public class REsHandler {
 				originalRE = this.replace_is_exist(originalRE, i);
 			}
 		}// 替换存在符?
+		originalRE = this.addConnectOperator(originalRE);// 添加连接运算符
 		return originalRE;
 	}
+
+	private String addConnectOperator(String originalRE) {
+		for (int i = 0; i < originalRE.length() - 1; i++) {
+			char thisChar = originalRE.charAt(i);
+			char nextChar = originalRE.charAt(i + 1);
+			if ((thisChar == Operator.r_pair) || isOperand(thisChar)) {
+				if ((nextChar == Operator.l_pair) || isOperand(nextChar)) {
+					originalRE = this.insertConnectOperator(originalRE, i);
+					i++;
+				}
+			}
+		}
+		return originalRE;
+	}// 添加连接运算符
+
+	private String insertConnectOperator(String str, int position) {
+		String before = str.substring(0, position + 1);
+		String after = str.substring(position + 1);
+		String res = before + Operator.connect + after;
+		return res;
+	}// 在字符串某一位插入一连接字符
+
+	private boolean isOperand(char c) {
+		if ((c == Operator.closure) || (c == Operator.connect) || (c == Operator.select) || (c == Operator.l_pair) || (c == Operator.r_pair) || (c == Operator.is_exist) || (c == Operator.pos_closure)) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	}// 判断是否为操作数
 
 	private String replace_is_exist(String originalRE, int position) {
 		int start = this.getStartOfOperand(originalRE, position);
@@ -109,7 +135,7 @@ public class REsHandler {
 		int start = this.getStartOfOperand(originalRE, position);
 		String before = originalRE.substring(0, start);
 		String target = originalRE.substring(start, position);// 正闭包操作数
-		target = Operator.l_pair + target + target + Operator.closure + Operator.r_pair;// r+=(rr*)
+		target = Operator.l_pair + target + Operator.connect + target + Operator.closure + Operator.r_pair;// r+=(rr*)
 		String after = originalRE.substring(position + 1);
 		String newRE = before + target + after;// 将正闭包去除后的正则表达式
 		return newRE;
