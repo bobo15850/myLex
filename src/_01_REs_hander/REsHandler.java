@@ -17,7 +17,20 @@ public class REsHandler {
 		this.REsPath = REsPath;
 	}
 
-	public List<String> getBasicREs() {
+	public String getTargetRE() {
+		StringBuilder builder = new StringBuilder();
+		List<String> REs = this.getBasicREs();
+		if (REs.size() > 0) {
+			builder.append(Operator.l_pair).append(REs.get(0)).append(Operator.r_pair);
+			for (int i = 1; i < REs.size(); i++) {
+				builder.append(Operator.select).append(Operator.l_pair).append(REs.get(i)).append(Operator.r_pair);
+			}
+			return builder.toString();
+		}
+		return null;
+	}// 将所有的分开的正则表达式用|符号做选择，合并成一个总的正则表达式
+
+	private List<String> getBasicREs() {
 		List<String> originalREs = this.getOriginalREs();
 		if (originalREs == null) {
 			return null;
@@ -40,6 +53,7 @@ public class REsHandler {
 		try {
 			fr = new FileReader(file);
 		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 			e.printStackTrace();
 			return null;// 找不到文件
 		}

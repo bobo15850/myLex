@@ -7,12 +7,12 @@ import common.BasicOperator;
 import common.NFAException;
 import common.Operator;
 
-public class NFA_graph {
+public class NFA {
 	private GraphNode startNode;// 起始点
 	private GraphNode endNode;// 结束点
 	private TreeMap<GraphNode, ArrayList<GraphEdge>> linkTable = new TreeMap<GraphNode, ArrayList<GraphEdge>>();// 邻接表
 
-	public NFA_graph(char c1, char c2, BasicOperator operator) throws NFAException {
+	public NFA(char c1, char c2, BasicOperator operator) throws NFAException {
 		if (operator == BasicOperator.connect) {
 			this.createConnectNFA(c1, c2);
 		}
@@ -24,7 +24,7 @@ public class NFA_graph {
 		}
 	}// 以两个字符构造基础的NFA,分为连接和选择两种方式
 
-	public NFA_graph(char c, BasicOperator operator) throws NFAException {
+	public NFA(char c, BasicOperator operator) throws NFAException {
 		if (operator == BasicOperator.closure) {
 			this.createClosureNFA(c);
 		}
@@ -122,7 +122,7 @@ public class NFA_graph {
 		this.linkTable.put(endNode, endList);
 	}// 以一个字符求闭包构造基础NFA
 
-	public void connectTo(char c) {
+	public void connectToChar(char c) {
 		GraphNode node = new GraphNode();
 		GraphEdge node_start = new GraphEdge(c, this.startNode);
 		ArrayList<GraphEdge> nodeList = new ArrayList<GraphEdge>();
@@ -131,7 +131,7 @@ public class NFA_graph {
 		this.startNode = node;
 	}// 连接到一个字符之后,相当于添加一个起始点，该点有一条到原先起始点权重为c的边
 
-	public void connectedBy(char c) {
+	public void connectedByChar(char c) {
 		GraphNode node = new GraphNode();
 		GraphEdge end_node = new GraphEdge(c, node);
 		ArrayList<GraphEdge> nodeList = new ArrayList<GraphEdge>();
@@ -140,7 +140,7 @@ public class NFA_graph {
 		this.endNode = node;
 	}// 在之后连接一个字符,相当于添加一个终点，原来的终点有一条权重为c的边指向该点
 
-	public void connectTo(NFA_graph NFA) {
+	public void connectToNFA(NFA NFA) {
 		GraphEdge NFAEnd_thisStart = new GraphEdge(Operator.ε, this.startNode);
 		NFA.linkTable.get(NFA.endNode).add(NFAEnd_thisStart);
 		for (GraphNode node : NFA.linkTable.keySet()) {
@@ -149,7 +149,7 @@ public class NFA_graph {
 		this.startNode = NFA.startNode;
 	}// 连接在一个NFA之后
 
-	public void connectedBy(NFA_graph NFA) {
+	public void connectedByNFA(NFA NFA) {
 		GraphEdge thisEnd_NFAStart = new GraphEdge(Operator.ε, NFA.startNode);
 		this.linkTable.get(this.endNode).add(thisEnd_NFAStart);
 		for (GraphNode node : NFA.linkTable.keySet()) {
@@ -158,7 +158,7 @@ public class NFA_graph {
 		this.endNode = NFA.endNode;
 	}// 之后连接一个NFA
 
-	public void select(char c) {
+	public void selectChar(char c) {
 		// 新建节点
 		GraphNode node0 = new GraphNode();
 		GraphNode node1 = new GraphNode();
@@ -191,7 +191,7 @@ public class NFA_graph {
 		this.endNode = node3;
 	}// 与一个字符做选择
 
-	public void select(NFA_graph NFA) {
+	public void selectNFA(NFA NFA) {
 		GraphNode node0 = new GraphNode();
 		GraphNode node1 = new GraphNode();
 		//
@@ -248,10 +248,10 @@ public class NFA_graph {
 			ArrayList<GraphEdge> temp = this.linkTable.get(node);
 			System.out.print(node.getId() + ":  ");
 			if (temp.size() > 0) {
-				System.out.print(temp.get(0).getValue() + "," + temp.get(0).getTargetNode().getId());
+				System.out.print(temp.get(0).getValue() + "-->" + temp.get(0).getTargetNode().getId());
 			}
 			for (int i = 1; i < temp.size(); i++) {
-				System.out.print(";  " + temp.get(i).getValue() + "," + temp.get(i).getTargetNode().getId());
+				System.out.print(";  " + temp.get(i).getValue() + "-->" + temp.get(i).getTargetNode().getId());
 			}
 			System.out.println();
 		}
