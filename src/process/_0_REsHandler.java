@@ -1,4 +1,4 @@
-package _01_REs_hander;
+package process;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,13 +7,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import common.Util;
 
-import common.Operator;
-
-public class REsHandler {
+public class _0_REsHandler {
 	private final String REsPath;// 文件路径
 
-	public REsHandler(String REsPath) {
+	public _0_REsHandler(String REsPath) {
 		this.REsPath = REsPath;
 	}
 
@@ -21,9 +20,9 @@ public class REsHandler {
 		StringBuilder builder = new StringBuilder();
 		List<String> REs = this.getBasicREs();
 		if (REs.size() > 0) {
-			builder.append(Operator.l_pair).append(REs.get(0)).append(Operator.r_pair);
+			builder.append(Util.Pair.left).append(REs.get(0)).append(Util.Pair.right);
 			for (int i = 1; i < REs.size(); i++) {
-				builder.append(Operator.select).append(Operator.l_pair).append(REs.get(i)).append(Operator.r_pair);
+				builder.append(Util.BasicOperator.select).append(Util.Pair.left).append(REs.get(i)).append(Util.Pair.right);
 			}
 			return builder.toString();
 		}
@@ -65,7 +64,7 @@ public class REsHandler {
 				if (temp.length() > 0) {
 					REsList.add(temp);
 				}
-			}//
+			}// 把空格当作普通字符处理，但是去除空行（有空格除外）
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;// 文件打开错误
@@ -78,12 +77,12 @@ public class REsHandler {
 			return null;
 		}
 		for (int i = 0; i < originalRE.length(); i++) {
-			if (originalRE.charAt(i) == Operator.pos_closure) {
+			if (originalRE.charAt(i) == Util.ExpandOperator.pos_closure) {
 				originalRE = this.replace_pos_closure(originalRE, i);
 			}
 		}// 替换正闭包+
 		for (int i = 0; i < originalRE.length(); i++) {
-			if (originalRE.charAt(i) == Operator.is_exist) {
+			if (originalRE.charAt(i) == Util.ExpandOperator.is_exist) {
 				originalRE = this.replace_is_exist(originalRE, i);
 			}
 		}// 替换存在符?
@@ -95,12 +94,12 @@ public class REsHandler {
 		for (int i = 0; i < originalRE.length() - 1; i++) {
 			char thisChar = originalRE.charAt(i);
 			char nextChar = originalRE.charAt(i + 1);
-			if ((thisChar == Operator.r_pair) || isOperand(thisChar)) {
-				if ((nextChar == Operator.l_pair) || isOperand(nextChar)) {
+			if ((thisChar == Util.Pair.right) || thisChar == Util.BasicOperator.closure || Util.isOperand(thisChar)) {
+				if ((nextChar == Util.Pair.left) || Util.isOperand(nextChar)) {
 					originalRE = this.insertConnectOperator(originalRE, i);
 					i++;
 				}
-			}
+			}// 右括号或者闭包符号或者操作数和左括号或者操作数之间有连接运算
 		}
 		return originalRE;
 	}// 添加连接运算符
@@ -108,24 +107,15 @@ public class REsHandler {
 	private String insertConnectOperator(String str, int position) {
 		String before = str.substring(0, position + 1);
 		String after = str.substring(position + 1);
-		String res = before + Operator.connect + after;
+		String res = before + Util.BasicOperator.connect + after;
 		return res;
 	}// 在字符串某一位插入一连接字符
-
-	private boolean isOperand(char c) {
-		if ((c == Operator.closure) || (c == Operator.connect) || (c == Operator.select) || (c == Operator.l_pair) || (c == Operator.r_pair) || (c == Operator.is_exist) || (c == Operator.pos_closure)) {
-			return false;
-		}
-		else {
-			return true;
-		}
-	}// 判断是否为操作数
 
 	private String replace_is_exist(String originalRE, int position) {
 		int start = this.getStartOfOperand(originalRE, position);
 		String before = originalRE.substring(0, start);
 		String target = originalRE.substring(start, position);
-		target = Operator.l_pair + target + Operator.select + Operator.ε + Operator.r_pair;// r?=(r|$)
+		target = Util.Pair.left + target + Util.BasicOperator.select + Util.SpecialOperand.ε + Util.Pair.right;// r?=(r|$)
 		String after = originalRE.substring(position + 1);
 		String newRE = before + target + after;// 将存在操作符去除后的正则表达式
 		return newRE;
@@ -135,7 +125,7 @@ public class REsHandler {
 		int start = this.getStartOfOperand(originalRE, position);
 		String before = originalRE.substring(0, start);
 		String target = originalRE.substring(start, position);// 正闭包操作数
-		target = Operator.l_pair + target + Operator.connect + target + Operator.closure + Operator.r_pair;// r+=(rr*)
+		target = Util.Pair.left + target + Util.BasicOperator.connect + target + Util.BasicOperator.closure + Util.Pair.right;// r+=(rr*)
 		String after = originalRE.substring(position + 1);
 		String newRE = before + target + after;// 将正闭包去除后的正则表达式
 		return newRE;
@@ -146,7 +136,7 @@ public class REsHandler {
 		boolean isSingle = true;// 是否是单个字符
 		int k = 0;
 		for (k = operatorPosition - 1; k >= 0; k--) {
-			if (str.charAt(k) == Operator.r_pair) {
+			if (str.charAt(k) == Util.Pair.right) {
 				isSingle = false;
 				pairNum++;
 			}
@@ -157,7 +147,7 @@ public class REsHandler {
 		int start = operatorPosition - 1;// 操作数起始位置
 		if (!isSingle) {
 			for (start = k; start >= 0; start--) {
-				if (str.charAt(start) == Operator.l_pair) {
+				if (str.charAt(start) == Util.Pair.left) {
 					pairNum--;
 					if (pairNum == 0) {
 						break;

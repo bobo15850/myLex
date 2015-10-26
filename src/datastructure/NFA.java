@@ -3,20 +3,19 @@ package datastructure;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import common.BasicOperator;
 import common.NFAException;
-import common.Operator;
+import common.Util;
 
 public class NFA {
 	private GraphNode startNode;// 起始点
 	private GraphNode endNode;// 结束点
 	private TreeMap<GraphNode, ArrayList<GraphEdge>> linkTable = new TreeMap<GraphNode, ArrayList<GraphEdge>>();// 邻接表
 
-	public NFA(char c1, char c2, BasicOperator operator) throws NFAException {
-		if (operator == BasicOperator.connect) {
+	public NFA(char c1, char c2, Util.BinaryBasicOperator operator) throws NFAException {
+		if (operator == Util.BinaryBasicOperator.connect) {
 			this.createConnectNFA(c1, c2);
 		}
-		else if (operator == BasicOperator.select) {
+		else if (operator == Util.BinaryBasicOperator.select) {
 			this.createSelectNFA(c1, c2);
 		}
 		else {
@@ -24,8 +23,8 @@ public class NFA {
 		}
 	}// 以两个字符构造基础的NFA,分为连接和选择两种方式
 
-	public NFA(char c, BasicOperator operator) throws NFAException {
-		if (operator == BasicOperator.closure) {
+	public NFA(char c, Util.UnaryBasicOperator operator) throws NFAException {
+		if (operator == Util.UnaryBasicOperator.closure) {
 			this.createClosureNFA(c);
 		}
 		else {
@@ -63,12 +62,12 @@ public class NFA {
 		GraphNode node4 = new GraphNode();
 		this.endNode = new GraphNode();
 		// 初始化六条边
-		GraphEdge start_node1 = new GraphEdge(Operator.ε, node1);
-		GraphEdge start_node3 = new GraphEdge(Operator.ε, node3);
+		GraphEdge start_node1 = new GraphEdge(Util.SpecialOperand.ε, node1);
+		GraphEdge start_node3 = new GraphEdge(Util.SpecialOperand.ε, node3);
 		GraphEdge node1_node2 = new GraphEdge(c1, node2);
-		GraphEdge node2_end = new GraphEdge(Operator.ε, this.endNode);
+		GraphEdge node2_end = new GraphEdge(Util.SpecialOperand.ε, this.endNode);
 		GraphEdge node3_node4 = new GraphEdge(c2, node4);
-		GraphEdge node4_end = new GraphEdge(Operator.ε, this.endNode);
+		GraphEdge node4_end = new GraphEdge(Util.SpecialOperand.ε, this.endNode);
 		// 初始化六个节点的邻接节点链表
 		ArrayList<GraphEdge> startList = new ArrayList<GraphEdge>();
 		ArrayList<GraphEdge> node1List = new ArrayList<GraphEdge>();
@@ -99,11 +98,11 @@ public class NFA {
 		GraphNode node2 = new GraphNode();
 		this.endNode = new GraphNode();
 		// 初始化五条边
-		GraphEdge start_to_node1 = new GraphEdge(Operator.ε, node1);
-		GraphEdge start_to_end = new GraphEdge(Operator.ε, endNode);
+		GraphEdge start_to_node1 = new GraphEdge(Util.SpecialOperand.ε, node1);
+		GraphEdge start_to_end = new GraphEdge(Util.SpecialOperand.ε, endNode);
 		GraphEdge node1_to_node2 = new GraphEdge(c, node2);
-		GraphEdge node2_to_end = new GraphEdge(Operator.ε, endNode);
-		GraphEdge node2_to_node1 = new GraphEdge(Operator.ε, node1);
+		GraphEdge node2_to_end = new GraphEdge(Util.SpecialOperand.ε, endNode);
+		GraphEdge node2_to_node1 = new GraphEdge(Util.SpecialOperand.ε, node1);
 		// 初始化四个节点的邻接节点链表
 		ArrayList<GraphEdge> startList = new ArrayList<GraphEdge>();
 		ArrayList<GraphEdge> node1List = new ArrayList<GraphEdge>();
@@ -141,7 +140,7 @@ public class NFA {
 	}// 在之后连接一个字符,相当于添加一个终点，原来的终点有一条权重为c的边指向该点
 
 	public void connectToNFA(NFA NFA) {
-		GraphEdge NFAEnd_thisStart = new GraphEdge(Operator.ε, this.startNode);
+		GraphEdge NFAEnd_thisStart = new GraphEdge(Util.SpecialOperand.ε, this.startNode);
 		NFA.linkTable.get(NFA.endNode).add(NFAEnd_thisStart);
 		for (GraphNode node : NFA.linkTable.keySet()) {
 			this.linkTable.put(node, NFA.linkTable.get(node));
@@ -150,7 +149,7 @@ public class NFA {
 	}// 连接在一个NFA之后
 
 	public void connectedByNFA(NFA NFA) {
-		GraphEdge thisEnd_NFAStart = new GraphEdge(Operator.ε, NFA.startNode);
+		GraphEdge thisEnd_NFAStart = new GraphEdge(Util.SpecialOperand.ε, NFA.startNode);
 		this.linkTable.get(this.endNode).add(thisEnd_NFAStart);
 		for (GraphNode node : NFA.linkTable.keySet()) {
 			this.linkTable.put(node, NFA.linkTable.get(node));
@@ -165,11 +164,11 @@ public class NFA {
 		GraphNode node2 = new GraphNode();
 		GraphNode node3 = new GraphNode();
 		// 新建边
-		GraphEdge node0_node1 = new GraphEdge(Operator.ε, node1);
+		GraphEdge node0_node1 = new GraphEdge(Util.SpecialOperand.ε, node1);
 		GraphEdge node1_node2 = new GraphEdge(c, node2);
-		GraphEdge node2_node3 = new GraphEdge(Operator.ε, node3);
-		GraphEdge node0_start = new GraphEdge(Operator.ε, this.startNode);
-		GraphEdge end_node3 = new GraphEdge(Operator.ε, node3);
+		GraphEdge node2_node3 = new GraphEdge(Util.SpecialOperand.ε, node3);
+		GraphEdge node0_start = new GraphEdge(Util.SpecialOperand.ε, this.startNode);
+		GraphEdge end_node3 = new GraphEdge(Util.SpecialOperand.ε, node3);
 		//
 		ArrayList<GraphEdge> node0List = new ArrayList<GraphEdge>();
 		ArrayList<GraphEdge> node1List = new ArrayList<GraphEdge>();
@@ -195,10 +194,10 @@ public class NFA {
 		GraphNode node0 = new GraphNode();
 		GraphNode node1 = new GraphNode();
 		//
-		GraphEdge node0_thisStart = new GraphEdge(Operator.ε, this.startNode);
-		GraphEdge node0_NFAStart = new GraphEdge(Operator.ε, NFA.startNode);
-		GraphEdge thisEnd_node1 = new GraphEdge(Operator.ε, node1);
-		GraphEdge NFAEnd_node1 = new GraphEdge(Operator.ε, node1);
+		GraphEdge node0_thisStart = new GraphEdge(Util.SpecialOperand.ε, this.startNode);
+		GraphEdge node0_NFAStart = new GraphEdge(Util.SpecialOperand.ε, NFA.startNode);
+		GraphEdge thisEnd_node1 = new GraphEdge(Util.SpecialOperand.ε, node1);
+		GraphEdge NFAEnd_node1 = new GraphEdge(Util.SpecialOperand.ε, node1);
 		//
 		ArrayList<GraphEdge> node0List = new ArrayList<GraphEdge>();
 		ArrayList<GraphEdge> node1List = new ArrayList<GraphEdge>();
@@ -223,10 +222,10 @@ public class NFA {
 		GraphNode node1 = new GraphNode();
 		GraphNode node2 = new GraphNode();
 		// 新建四条边
-		GraphEdge node1_start = new GraphEdge(Operator.ε, startNode);
-		GraphEdge node1_node2 = new GraphEdge(Operator.ε, node2);
-		GraphEdge end_start = new GraphEdge(Operator.ε, startNode);
-		GraphEdge end_node2 = new GraphEdge(Operator.ε, node2);
+		GraphEdge node1_start = new GraphEdge(Util.SpecialOperand.ε, startNode);
+		GraphEdge node1_node2 = new GraphEdge(Util.SpecialOperand.ε, node2);
+		GraphEdge end_start = new GraphEdge(Util.SpecialOperand.ε, startNode);
+		GraphEdge end_node2 = new GraphEdge(Util.SpecialOperand.ε, node2);
 		// 新建两个节点的邻接节点链表
 		ArrayList<GraphEdge> node1List = new ArrayList<GraphEdge>();
 		ArrayList<GraphEdge> node2List = new ArrayList<GraphEdge>();
