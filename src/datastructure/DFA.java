@@ -40,29 +40,31 @@ public class DFA {
 		}
 	}// 由NFA构造DFA
 
-	public void print() {
-		System.out.println("开始节点如下：");
-		System.out.println(this.startNode.toString());
-		System.out.println("终结节点如下：");
+	public String toString() {
+		StringBuilder resSb = new StringBuilder();
+		String nextLine = "\r\n";
+		resSb.append("开始节点如下：").append(nextLine);
+		resSb.append(this.startNode.toString()).append(nextLine);
+		resSb.append("终结节点如下：").append(nextLine);
 		for (DFANode node : this.endNodeSet) {
-			System.out.println(node.toString());
+			resSb.append(node.toString()).append(nextLine);
 		}
-		System.out.println("所有的转换值如下：");
+		resSb.append("所有的转换值如下：").append(nextLine);
 		for (char c : this.edgeWeightSet) {
-			System.out.println(c);
+			resSb.append(c).append(nextLine);
 		}
-		System.out.println("邻接表如下：");
+		resSb.append("邻接表如下：").append(nextLine);
 		for (DFANode node : this.linkTable.keySet()) {
 			ArrayList<DFAEdge> linkEdge = linkTable.get(node);
-			System.out.print(node.toString() + ":   ");
+			resSb.append(node.toString() + ":   ");
 			if (linkEdge.size() != 0) {
-				System.out.print(linkEdge.get(0).getValue() + "-->" + linkEdge.get(0).getTargetNode().toString());
+				resSb.append(linkEdge.get(0));
 				for (int i = 1; i < linkEdge.size(); i++) {
-					System.out.print(";  " + linkEdge.get(i).getValue() + "-->" + linkEdge.get(i).getTargetNode().toString());
+					resSb.append(";  " + linkEdge.get(i).toString());
 				}
 			}
-			System.out.println();
+			resSb.append(nextLine);
 		}
-
+		return resSb.toString();
 	}
 }

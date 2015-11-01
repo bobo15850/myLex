@@ -1,16 +1,15 @@
-package process;
+package datastructure;
 
 import java.util.Stack;
 
 import common.NFAException;
 import common.NotFoundREsException;
 import common.Util;
-import datastructure.NFA;
 
-public class _1_RE_to_NFA {
+public class StandardRE {
 	private final String RE;// 最终的正则表达式，只存在(),|,*和连接运算
 
-	public _1_RE_to_NFA(String RE) throws NotFoundREsException {
+	public StandardRE(String RE) throws NotFoundREsException {
 		this.RE = RE;
 		if (RE == null) {
 			throw new NotFoundREsException();

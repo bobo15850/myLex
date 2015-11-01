@@ -1,4 +1,4 @@
-package process;
+package datastructure;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,10 +9,10 @@ import java.util.LinkedList;
 import java.util.List;
 import common.Util;
 
-public class _0_REsHandler {
+public class REFile {
 	private final String REsPath;// ÎÄ¼þÂ·¾¶
 
-	public _0_REsHandler(String REsPath) {
+	public REFile(String REsPath) {
 		this.REsPath = REsPath;
 	}
 

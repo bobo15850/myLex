@@ -19,4 +19,8 @@ public class NFAEdge {
 	public NFANode getTargetNode() {
 		return targetNode;
 	}
+
+	public String toString() {
+		return this.value + "-->" + this.targetNode;
+	}
 }

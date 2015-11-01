@@ -267,18 +267,26 @@ public class NFA {
 		return linkTable;
 	}
 
-	public void print() {
+	public String toString() {
+		StringBuilder resSb = new StringBuilder();
+		String nextLine = "\r\n";
+		resSb.append("开始节点为：").append(nextLine);
+		resSb.append(this.startNode).append(nextLine);
+		resSb.append("结束节点为：").append(nextLine);
+		resSb.append(this.endNode).append(nextLine);
+		resSb.append("邻接表为：").append(nextLine);
 		for (NFANode node : this.linkTable.keySet()) {
 			ArrayList<NFAEdge> temp = this.linkTable.get(node);
-			System.out.print(node.getId() + ":  ");
+			resSb.append(node.toString() + ":  ");
 			if (temp.size() > 0) {
-				System.out.print(temp.get(0).getValue() + "-->" + temp.get(0).getTargetNode().getId());
+				resSb.append(temp.get(0).toString());
 			}
 			for (int i = 1; i < temp.size(); i++) {
-				System.out.print(";  " + temp.get(i).getValue() + "-->" + temp.get(i).getTargetNode().getId());
+				resSb.append(";  " + temp.get(i).toString());
 			}
-			System.out.println();
+			resSb.append(nextLine);
 		}
+		return resSb.toString();
 	}// 打印输出图的邻接表
 
 	public DFANode gettargetDFANode(final DFANode dfaNode, char c) {

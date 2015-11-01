@@ -16,4 +16,8 @@ public class DFAEdge {
 	public DFANode getTargetNode() {
 		return targetNode;
 	}
+
+	public String toString() {
+		return value + "-->" + this.targetNode.toString();
+	}
 }
