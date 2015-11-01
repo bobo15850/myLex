@@ -40,6 +40,10 @@ public class DFA {
 		}
 	}// ”…NFAππ‘ÏDFA
 
+	public void minDFA() {
+		
+	}
+
 	public String toString() {
 		StringBuilder resSb = new StringBuilder();
 		String nextLine = "\r\n";

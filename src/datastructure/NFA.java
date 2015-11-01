@@ -267,28 +267,6 @@ public class NFA {
 		return linkTable;
 	}
 
-	public String toString() {
-		StringBuilder resSb = new StringBuilder();
-		String nextLine = "\r\n";
-		resSb.append("开始节点为：").append(nextLine);
-		resSb.append(this.startNode).append(nextLine);
-		resSb.append("结束节点为：").append(nextLine);
-		resSb.append(this.endNode).append(nextLine);
-		resSb.append("邻接表为：").append(nextLine);
-		for (NFANode node : this.linkTable.keySet()) {
-			ArrayList<NFAEdge> temp = this.linkTable.get(node);
-			resSb.append(node.toString() + ":  ");
-			if (temp.size() > 0) {
-				resSb.append(temp.get(0).toString());
-			}
-			for (int i = 1; i < temp.size(); i++) {
-				resSb.append(";  " + temp.get(i).toString());
-			}
-			resSb.append(nextLine);
-		}
-		return resSb.toString();
-	}// 打印输出图的邻接表
-
 	public DFANode gettargetDFANode(final DFANode dfaNode, char c) {
 		final Set<NFANode> rawNfaNode = dfaNode.getValue();
 		Set<NFANode> newNfaNode = new TreeSet<NFANode>();
@@ -333,4 +311,26 @@ public class NFA {
 		}
 		return dfaNode.cantains(endNode);
 	}// 判断一个dfa节点是否含有NFA的终结节点
+
+	public String toString() {
+		StringBuilder resSb = new StringBuilder();
+		String nextLine = "\r\n";
+		resSb.append("开始节点为：").append(nextLine);
+		resSb.append(this.startNode).append(nextLine);
+		resSb.append("结束节点为：").append(nextLine);
+		resSb.append(this.endNode).append(nextLine);
+		resSb.append("邻接表为：").append(nextLine);
+		for (NFANode node : this.linkTable.keySet()) {
+			ArrayList<NFAEdge> temp = this.linkTable.get(node);
+			resSb.append(node.toString() + ":  ");
+			if (temp.size() > 0) {
+				resSb.append(temp.get(0).toString());
+			}
+			for (int i = 1; i < temp.size(); i++) {
+				resSb.append(";  " + temp.get(i).toString());
+			}
+			resSb.append(nextLine);
+		}
+		return resSb.toString();
+	}// 输出NFA的所有信息
 }

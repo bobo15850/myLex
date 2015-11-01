@@ -13,8 +13,8 @@ public class Start {
 		String targetRE = handler.getTargetRE();
 		System.out.println(targetRE);
 		try {
-			StandardRE re_to_nfa = new StandardRE(targetRE);
-			NFA nfa = re_to_nfa.getNFA();
+			StandardRE standardRE = new StandardRE(targetRE);
+			NFA nfa = standardRE.getNFA();
 			System.out.println(nfa.toString());
 			DFA dfa = new DFA(nfa);
 			System.out.println(dfa.toString());
