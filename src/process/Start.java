@@ -1,5 +1,8 @@
 package process;
+
 import common.NotFoundREsException;
+
+import datastructure.DFA;
 import datastructure.NFA;
 
 public class Start {
@@ -12,6 +15,8 @@ public class Start {
 			_1_RE_to_NFA re_to_nfa = new _1_RE_to_NFA(targetRE);
 			NFA nfa = re_to_nfa.getNFA();
 			nfa.print();
+			DFA dfa = new DFA(nfa);
+			dfa.print();
 		} catch (NotFoundREsException e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());

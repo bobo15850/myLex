@@ -1,10 +1,10 @@
 package datastructure;
 
-public class GraphNode implements Comparable<GraphNode> {
+public class NFANode implements Comparable<NFANode> {
 	private static int nodeId = 0;// 静态变量，保证图上所有点的编号不同
 	private final int id;// 图的编号，是自动获取
 
-	public GraphNode() {
+	public NFANode() {
 		this.id = nodeId++;
 	}
 
@@ -28,14 +28,19 @@ public class GraphNode implements Comparable<GraphNode> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		GraphNode other = (GraphNode) obj;
+		NFANode other = (NFANode) obj;
 		if (id != other.id)
 			return false;
 		return true;
 	}
 
 	@Override
-	public int compareTo(GraphNode node) {
+	public int compareTo(NFANode node) {
 		return this.id - node.id;
+	}
+
+	@Override
+	public String toString() {
+		return String.valueOf(this.id);
 	}
 }

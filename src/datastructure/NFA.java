@@ -1,15 +1,21 @@
 package datastructure;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import common.NFAException;
 import common.Util;
 
 public class NFA {
-	private GraphNode startNode;// 起始点
-	private GraphNode endNode;// 结束点
-	private TreeMap<GraphNode, ArrayList<GraphEdge>> linkTable = new TreeMap<GraphNode, ArrayList<GraphEdge>>();// 邻接表
+	private NFANode startNode;// 起始点
+	private NFANode endNode;// 结束点
+	private Set<Character> edgeWeightSet = new TreeSet<Character>();// 权重的集合
+	private Map<NFANode, ArrayList<NFAEdge>> linkTable = new TreeMap<NFANode, ArrayList<NFAEdge>>();// 邻接表
 
 	public NFA(char c1, char c2, Util.BinaryBasicOperator operator) throws NFAException {
 		if (operator == Util.BinaryBasicOperator.connect) {
@@ -33,17 +39,19 @@ public class NFA {
 	}// 以一个字符闭包的形式构造基础的NFA
 
 	private void createConnectNFA(char c1, char c2) {
+		this.edgeWeightSet.add(c1);
+		this.edgeWeightSet.add(c2);
 		// 初始化三个节点
-		this.startNode = new GraphNode();
-		GraphNode node = new GraphNode();
-		this.endNode = new GraphNode();
+		this.startNode = new NFANode();
+		NFANode node = new NFANode();
+		this.endNode = new NFANode();
 		// 初始化两条边
-		GraphEdge start_node = new GraphEdge(c1, node);
-		GraphEdge node_end = new GraphEdge(c2, endNode);
+		NFAEdge start_node = new NFAEdge(c1, node);
+		NFAEdge node_end = new NFAEdge(c2, endNode);
 		// 初始化三个节点的邻接边链表
-		ArrayList<GraphEdge> startList = new ArrayList<GraphEdge>();
-		ArrayList<GraphEdge> nodeList = new ArrayList<GraphEdge>();
-		ArrayList<GraphEdge> endList = new ArrayList<GraphEdge>();
+		ArrayList<NFAEdge> startList = new ArrayList<NFAEdge>();
+		ArrayList<NFAEdge> nodeList = new ArrayList<NFAEdge>();
+		ArrayList<NFAEdge> endList = new ArrayList<NFAEdge>();
 		// 连接边和节点
 		startList.add(start_node);
 		nodeList.add(node_end);
@@ -54,27 +62,29 @@ public class NFA {
 	}// 以两个字符连接构造基础的NFA
 
 	private void createSelectNFA(char c1, char c2) {
+		this.edgeWeightSet.add(c1);
+		this.edgeWeightSet.add(c2);
 		// 初始化六个节点
-		this.startNode = new GraphNode();
-		GraphNode node1 = new GraphNode();
-		GraphNode node2 = new GraphNode();
-		GraphNode node3 = new GraphNode();
-		GraphNode node4 = new GraphNode();
-		this.endNode = new GraphNode();
+		this.startNode = new NFANode();
+		NFANode node1 = new NFANode();
+		NFANode node2 = new NFANode();
+		NFANode node3 = new NFANode();
+		NFANode node4 = new NFANode();
+		this.endNode = new NFANode();
 		// 初始化六条边
-		GraphEdge start_node1 = new GraphEdge(Util.SpecialOperand.ε, node1);
-		GraphEdge start_node3 = new GraphEdge(Util.SpecialOperand.ε, node3);
-		GraphEdge node1_node2 = new GraphEdge(c1, node2);
-		GraphEdge node2_end = new GraphEdge(Util.SpecialOperand.ε, this.endNode);
-		GraphEdge node3_node4 = new GraphEdge(c2, node4);
-		GraphEdge node4_end = new GraphEdge(Util.SpecialOperand.ε, this.endNode);
+		NFAEdge start_node1 = new NFAEdge(Util.SpecialOperand.ε, node1);
+		NFAEdge start_node3 = new NFAEdge(Util.SpecialOperand.ε, node3);
+		NFAEdge node1_node2 = new NFAEdge(c1, node2);
+		NFAEdge node2_end = new NFAEdge(Util.SpecialOperand.ε, this.endNode);
+		NFAEdge node3_node4 = new NFAEdge(c2, node4);
+		NFAEdge node4_end = new NFAEdge(Util.SpecialOperand.ε, this.endNode);
 		// 初始化六个节点的邻接节点链表
-		ArrayList<GraphEdge> startList = new ArrayList<GraphEdge>();
-		ArrayList<GraphEdge> node1List = new ArrayList<GraphEdge>();
-		ArrayList<GraphEdge> node2List = new ArrayList<GraphEdge>();
-		ArrayList<GraphEdge> node3List = new ArrayList<GraphEdge>();
-		ArrayList<GraphEdge> node4List = new ArrayList<GraphEdge>();
-		ArrayList<GraphEdge> endList = new ArrayList<GraphEdge>();
+		ArrayList<NFAEdge> startList = new ArrayList<NFAEdge>();
+		ArrayList<NFAEdge> node1List = new ArrayList<NFAEdge>();
+		ArrayList<NFAEdge> node2List = new ArrayList<NFAEdge>();
+		ArrayList<NFAEdge> node3List = new ArrayList<NFAEdge>();
+		ArrayList<NFAEdge> node4List = new ArrayList<NFAEdge>();
+		ArrayList<NFAEdge> endList = new ArrayList<NFAEdge>();
 		// 连接边和节点
 		startList.add(start_node1);
 		startList.add(start_node3);
@@ -92,22 +102,23 @@ public class NFA {
 	}// 以两个字符选择构造基础的NFA
 
 	private void createClosureNFA(char c) {
+		this.edgeWeightSet.add(c);
 		// 初始化四个节点
-		this.startNode = new GraphNode();
-		GraphNode node1 = new GraphNode();
-		GraphNode node2 = new GraphNode();
-		this.endNode = new GraphNode();
+		this.startNode = new NFANode();
+		NFANode node1 = new NFANode();
+		NFANode node2 = new NFANode();
+		this.endNode = new NFANode();
 		// 初始化五条边
-		GraphEdge start_to_node1 = new GraphEdge(Util.SpecialOperand.ε, node1);
-		GraphEdge start_to_end = new GraphEdge(Util.SpecialOperand.ε, endNode);
-		GraphEdge node1_to_node2 = new GraphEdge(c, node2);
-		GraphEdge node2_to_end = new GraphEdge(Util.SpecialOperand.ε, endNode);
-		GraphEdge node2_to_node1 = new GraphEdge(Util.SpecialOperand.ε, node1);
+		NFAEdge start_to_node1 = new NFAEdge(Util.SpecialOperand.ε, node1);
+		NFAEdge start_to_end = new NFAEdge(Util.SpecialOperand.ε, endNode);
+		NFAEdge node1_to_node2 = new NFAEdge(c, node2);
+		NFAEdge node2_to_end = new NFAEdge(Util.SpecialOperand.ε, endNode);
+		NFAEdge node2_to_node1 = new NFAEdge(Util.SpecialOperand.ε, node1);
 		// 初始化四个节点的邻接节点链表
-		ArrayList<GraphEdge> startList = new ArrayList<GraphEdge>();
-		ArrayList<GraphEdge> node1List = new ArrayList<GraphEdge>();
-		ArrayList<GraphEdge> node2List = new ArrayList<GraphEdge>();
-		ArrayList<GraphEdge> endList = new ArrayList<GraphEdge>();
+		ArrayList<NFAEdge> startList = new ArrayList<NFAEdge>();
+		ArrayList<NFAEdge> node1List = new ArrayList<NFAEdge>();
+		ArrayList<NFAEdge> node2List = new ArrayList<NFAEdge>();
+		ArrayList<NFAEdge> endList = new ArrayList<NFAEdge>();
 		// 连接边和节点
 		startList.add(start_to_node1);
 		startList.add(start_to_end);
@@ -122,58 +133,63 @@ public class NFA {
 	}// 以一个字符求闭包构造基础NFA
 
 	public void connectToChar(char c) {
-		GraphNode node = new GraphNode();
-		GraphEdge node_start = new GraphEdge(c, this.startNode);
-		ArrayList<GraphEdge> nodeList = new ArrayList<GraphEdge>();
+		this.edgeWeightSet.add(c);
+		NFANode node = new NFANode();
+		NFAEdge node_start = new NFAEdge(c, this.startNode);
+		ArrayList<NFAEdge> nodeList = new ArrayList<NFAEdge>();
 		nodeList.add(node_start);
 		this.linkTable.put(node, nodeList);
 		this.startNode = node;
 	}// 连接到一个字符之后,相当于添加一个起始点，该点有一条到原先起始点权重为c的边
 
 	public void connectedByChar(char c) {
-		GraphNode node = new GraphNode();
-		GraphEdge end_node = new GraphEdge(c, node);
-		ArrayList<GraphEdge> nodeList = new ArrayList<GraphEdge>();
+		this.edgeWeightSet.add(c);
+		NFANode node = new NFANode();
+		NFAEdge end_node = new NFAEdge(c, node);
+		ArrayList<NFAEdge> nodeList = new ArrayList<NFAEdge>();
 		this.linkTable.get(this.endNode).add(end_node);
 		this.linkTable.put(node, nodeList);
 		this.endNode = node;
 	}// 在之后连接一个字符,相当于添加一个终点，原来的终点有一条权重为c的边指向该点
 
 	public void connectToNFA(NFA NFA) {
-		GraphEdge NFAEnd_thisStart = new GraphEdge(Util.SpecialOperand.ε, this.startNode);
+		this.edgeWeightSet.addAll(NFA.edgeWeightSet);
+		NFAEdge NFAEnd_thisStart = new NFAEdge(Util.SpecialOperand.ε, this.startNode);
 		NFA.linkTable.get(NFA.endNode).add(NFAEnd_thisStart);
-		for (GraphNode node : NFA.linkTable.keySet()) {
+		for (NFANode node : NFA.linkTable.keySet()) {
 			this.linkTable.put(node, NFA.linkTable.get(node));
 		}
 		this.startNode = NFA.startNode;
 	}// 连接在一个NFA之后
 
 	public void connectedByNFA(NFA NFA) {
-		GraphEdge thisEnd_NFAStart = new GraphEdge(Util.SpecialOperand.ε, NFA.startNode);
+		this.edgeWeightSet.addAll(NFA.edgeWeightSet);
+		NFAEdge thisEnd_NFAStart = new NFAEdge(Util.SpecialOperand.ε, NFA.startNode);
 		this.linkTable.get(this.endNode).add(thisEnd_NFAStart);
-		for (GraphNode node : NFA.linkTable.keySet()) {
+		for (NFANode node : NFA.linkTable.keySet()) {
 			this.linkTable.put(node, NFA.linkTable.get(node));
 		}
 		this.endNode = NFA.endNode;
 	}// 之后连接一个NFA
 
 	public void selectChar(char c) {
+		this.edgeWeightSet.add(c);
 		// 新建节点
-		GraphNode node0 = new GraphNode();
-		GraphNode node1 = new GraphNode();
-		GraphNode node2 = new GraphNode();
-		GraphNode node3 = new GraphNode();
+		NFANode node0 = new NFANode();
+		NFANode node1 = new NFANode();
+		NFANode node2 = new NFANode();
+		NFANode node3 = new NFANode();
 		// 新建边
-		GraphEdge node0_node1 = new GraphEdge(Util.SpecialOperand.ε, node1);
-		GraphEdge node1_node2 = new GraphEdge(c, node2);
-		GraphEdge node2_node3 = new GraphEdge(Util.SpecialOperand.ε, node3);
-		GraphEdge node0_start = new GraphEdge(Util.SpecialOperand.ε, this.startNode);
-		GraphEdge end_node3 = new GraphEdge(Util.SpecialOperand.ε, node3);
+		NFAEdge node0_node1 = new NFAEdge(Util.SpecialOperand.ε, node1);
+		NFAEdge node1_node2 = new NFAEdge(c, node2);
+		NFAEdge node2_node3 = new NFAEdge(Util.SpecialOperand.ε, node3);
+		NFAEdge node0_start = new NFAEdge(Util.SpecialOperand.ε, this.startNode);
+		NFAEdge end_node3 = new NFAEdge(Util.SpecialOperand.ε, node3);
 		//
-		ArrayList<GraphEdge> node0List = new ArrayList<GraphEdge>();
-		ArrayList<GraphEdge> node1List = new ArrayList<GraphEdge>();
-		ArrayList<GraphEdge> node2List = new ArrayList<GraphEdge>();
-		ArrayList<GraphEdge> node3List = new ArrayList<GraphEdge>();
+		ArrayList<NFAEdge> node0List = new ArrayList<NFAEdge>();
+		ArrayList<NFAEdge> node1List = new ArrayList<NFAEdge>();
+		ArrayList<NFAEdge> node2List = new ArrayList<NFAEdge>();
+		ArrayList<NFAEdge> node3List = new ArrayList<NFAEdge>();
 		// 连接边和节点
 		node0List.add(node0_node1);
 		node0List.add(node0_start);
@@ -191,16 +207,17 @@ public class NFA {
 	}// 与一个字符做选择
 
 	public void selectNFA(NFA NFA) {
-		GraphNode node0 = new GraphNode();
-		GraphNode node1 = new GraphNode();
+		this.edgeWeightSet.addAll(NFA.edgeWeightSet);
+		NFANode node0 = new NFANode();
+		NFANode node1 = new NFANode();
 		//
-		GraphEdge node0_thisStart = new GraphEdge(Util.SpecialOperand.ε, this.startNode);
-		GraphEdge node0_NFAStart = new GraphEdge(Util.SpecialOperand.ε, NFA.startNode);
-		GraphEdge thisEnd_node1 = new GraphEdge(Util.SpecialOperand.ε, node1);
-		GraphEdge NFAEnd_node1 = new GraphEdge(Util.SpecialOperand.ε, node1);
+		NFAEdge node0_thisStart = new NFAEdge(Util.SpecialOperand.ε, this.startNode);
+		NFAEdge node0_NFAStart = new NFAEdge(Util.SpecialOperand.ε, NFA.startNode);
+		NFAEdge thisEnd_node1 = new NFAEdge(Util.SpecialOperand.ε, node1);
+		NFAEdge NFAEnd_node1 = new NFAEdge(Util.SpecialOperand.ε, node1);
 		//
-		ArrayList<GraphEdge> node0List = new ArrayList<GraphEdge>();
-		ArrayList<GraphEdge> node1List = new ArrayList<GraphEdge>();
+		ArrayList<NFAEdge> node0List = new ArrayList<NFAEdge>();
+		ArrayList<NFAEdge> node1List = new ArrayList<NFAEdge>();
 		//
 		node0List.add(node0_thisStart);
 		node0List.add(node0_NFAStart);
@@ -209,7 +226,7 @@ public class NFA {
 		//
 		this.linkTable.put(node0, node0List);
 		this.linkTable.put(node1, node1List);
-		for (GraphNode node : NFA.linkTable.keySet()) {
+		for (NFANode node : NFA.linkTable.keySet()) {
 			this.linkTable.put(node, NFA.linkTable.get(node));
 		}
 		//
@@ -219,16 +236,16 @@ public class NFA {
 
 	public void closure() {
 		// 新建两个节点
-		GraphNode node1 = new GraphNode();
-		GraphNode node2 = new GraphNode();
+		NFANode node1 = new NFANode();
+		NFANode node2 = new NFANode();
 		// 新建四条边
-		GraphEdge node1_start = new GraphEdge(Util.SpecialOperand.ε, startNode);
-		GraphEdge node1_node2 = new GraphEdge(Util.SpecialOperand.ε, node2);
-		GraphEdge end_start = new GraphEdge(Util.SpecialOperand.ε, startNode);
-		GraphEdge end_node2 = new GraphEdge(Util.SpecialOperand.ε, node2);
+		NFAEdge node1_start = new NFAEdge(Util.SpecialOperand.ε, startNode);
+		NFAEdge node1_node2 = new NFAEdge(Util.SpecialOperand.ε, node2);
+		NFAEdge end_start = new NFAEdge(Util.SpecialOperand.ε, startNode);
+		NFAEdge end_node2 = new NFAEdge(Util.SpecialOperand.ε, node2);
 		// 新建两个节点的邻接节点链表
-		ArrayList<GraphEdge> node1List = new ArrayList<GraphEdge>();
-		ArrayList<GraphEdge> node2List = new ArrayList<GraphEdge>();
+		ArrayList<NFAEdge> node1List = new ArrayList<NFAEdge>();
+		ArrayList<NFAEdge> node2List = new ArrayList<NFAEdge>();
 		// 连接边和节点
 		node1List.add(node1_start);
 		node1List.add(node1_node2);
@@ -242,9 +259,17 @@ public class NFA {
 		this.endNode = node2;
 	}// 将该NFA做一个闭包
 
+	public Set<Character> getEdgeWeightSet() {
+		return edgeWeightSet;
+	}
+
+	public Map<NFANode, ArrayList<NFAEdge>> getLinkTable() {
+		return linkTable;
+	}
+
 	public void print() {
-		for (GraphNode node : this.linkTable.keySet()) {
-			ArrayList<GraphEdge> temp = this.linkTable.get(node);
+		for (NFANode node : this.linkTable.keySet()) {
+			ArrayList<NFAEdge> temp = this.linkTable.get(node);
 			System.out.print(node.getId() + ":  ");
 			if (temp.size() > 0) {
 				System.out.print(temp.get(0).getValue() + "-->" + temp.get(0).getTargetNode().getId());
@@ -255,4 +280,49 @@ public class NFA {
 			System.out.println();
 		}
 	}// 打印输出图的邻接表
+
+	public DFANode gettargetDFANode(final DFANode dfaNode, char c) {
+		final Set<NFANode> rawNfaNode = dfaNode.getValue();
+		Set<NFANode> newNfaNode = new TreeSet<NFANode>();
+		Set<NFANode> vistedNfaNode = new TreeSet<NFANode>();
+		Queue<NFANode> queue = new LinkedList<NFANode>();
+		queue.addAll(rawNfaNode);
+		while (!queue.isEmpty()) {
+			NFANode tempNode = queue.poll();
+			ArrayList<NFAEdge> linkEdge = this.linkTable.get(tempNode);
+			for (int i = 0; i < linkEdge.size(); i++) {
+				char val = linkEdge.get(i).getValue();
+				NFANode node = linkEdge.get(i).getTargetNode();
+				if (val == c) {
+					newNfaNode.add(node);
+				}
+				else if (val == Util.SpecialOperand.ε) {
+					if (!(vistedNfaNode.contains(node) || tempNode.equals(node) || queue.contains(node))) {
+						queue.offer(node);
+					}
+				}
+			}
+			vistedNfaNode.add(tempNode);
+		}
+		DFANode newDfaNode = null;
+		if (newNfaNode.size() != 0) {
+			newDfaNode = new DFANode(newNfaNode);
+		}
+		return newDfaNode;
+	}// 得到某一个DFA通过某一权重可以达到的NFA节点的集合所构成的DFANode
+
+	public DFANode getStartNodeEpsilonClosure() {
+		Set<NFANode> nfaNodeSet = new TreeSet<NFANode>();
+		nfaNodeSet.add(startNode);
+		DFANode startDFANode = new DFANode(nfaNodeSet);
+		startDFANode.ebsilonClosure(this);
+		return startDFANode;
+	}// 得到开始节点的EpsilonClosure
+
+	public boolean isHasEndNFANode(final DFANode dfaNode) {
+		if (dfaNode == null) {
+			return false;
+		}
+		return dfaNode.cantains(endNode);
+	}// 判断一个dfa节点是否含有NFA的终结节点
 }
