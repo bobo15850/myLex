@@ -12,6 +12,8 @@ import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import common.Util;
+
 public class DFA {
 	private DFANode startNode;// 开始节点
 	private Set<DFANode> endNodeSet = new TreeSet<DFANode>();// 终止节点集合
@@ -20,7 +22,10 @@ public class DFA {
 	private Set<Division> divisionSet = new HashSet<Division>();// 划分集合
 
 	public DFA(NFA nfa) {
-		this.charSet = nfa.getEdgeWeightSet();// 得到所有的边上的值的集合
+		this.charSet = this.getDeepCopy(nfa.getCharSet());// 得到所有的边上的值的集合
+		if (this.charSet.contains(Util.SpecialOperand.ε)) {
+			this.charSet.remove(Util.SpecialOperand.ε);
+		}
 		this.startNode = nfa.getStartNodeEpsilonClosure();// 得到开始节点
 		Queue<DFANode> queue = new LinkedList<DFANode>();
 		queue.add(startNode);
@@ -55,22 +60,35 @@ public class DFA {
 		}
 		Division acceptedDivision = new Division(acceptedNodeSet);// 可接受状态集
 		Stack<Division> stack = new Stack<Division>();
-		this.divisionSet.add(acceptedDivision);
+		if (acceptedNodeSet.size() != 0) {
+			this.divisionSet.add(acceptedDivision);
+		}
 		this.divisionSet.add(unacceptedDivison);
-		stack.push(unacceptedDivison);
-		stack.push(acceptedDivision);
-		while (!stack.isEmpty()) {
-			Division oldDivision = stack.pop();
-			la: for (char c : this.charSet) {
-				Set<Division> newDivisionSet = this.split(oldDivision, c);
-				if (newDivisionSet.size() > 1) {
-					this.divisionSet.remove(oldDivision);
-					this.divisionSet.addAll(newDivisionSet);
-					for (Division temp : newDivisionSet) {
-						stack.push(temp);
-					}
-					break la;
-				}// 可划分
+		Set<Division> preDivisionSet = new HashSet<Division>();
+		preDivisionSet = this.getDeepCopy(this.divisionSet);
+		while (true) {
+			for (Division division : this.divisionSet) {
+				stack.push(division);
+			}
+			while (!stack.isEmpty()) {
+				Division oldDivision = stack.pop();
+				lb: for (char c : this.charSet) {
+					Set<Division> newDivisionSet = this.split(oldDivision, c);
+					if (newDivisionSet.size() > 1) {
+						this.divisionSet.remove(oldDivision);
+						this.divisionSet.addAll(newDivisionSet);
+						for (Division temp : newDivisionSet) {
+							stack.push(temp);
+						}
+						break lb;
+					}// 可划分
+				}
+			}
+			if (preDivisionSet.size() == this.divisionSet.size()) {
+				break;
+			}
+			else {
+				preDivisionSet = this.getDeepCopy(divisionSet);
 			}
 		}
 		Division startDivision = this.getDivisionOfNode(startNode);// 起始划分
@@ -90,6 +108,14 @@ public class DFA {
 			minDFALinkTable.put(division, linkEdge);
 		}
 		return new MinDFA(startDivision, endDivisionSet, charSet, minDFALinkTable);
+	}
+
+	private <T> Set<T> getDeepCopy(Set<T> set) {
+		Set<T> resSet = new HashSet<T>();
+		for (T t : set) {
+			resSet.add(t);
+		}
+		return resSet;
 	}
 
 	private Set<Division> split(Division oldDivision, char c) {

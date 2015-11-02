@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import common.NotEndException;
 import common.UnknownCharException;
 
 public class MinDFA {
@@ -45,7 +46,7 @@ public class MinDFA {
 		return resSb.toString();
 	}
 
-	public List<String> getTokenList(String str) throws UnknownCharException {
+	public List<String> getTokenList(String str) throws UnknownCharException, NotEndException {
 		Division curState = start;
 		List<String> tokenList = new ArrayList<String>();
 		String token = "";
@@ -61,14 +62,24 @@ public class MinDFA {
 					}
 				}
 				if (!hasNext) {
-					tokenList.add(token);
-					token = "";
-					curState = start;
-					str = str.substring(i);
-					i = -1;
+					if (this.endSet.contains(curState)) {
+						tokenList.add(token);
+						token = "";
+						curState = start;
+						str = str.substring(i);
+						i = -1;
+					}
+					else {
+						throw new NotEndException();
+					}
 				}
 				if (i == str.length() - 1) {
-					tokenList.add(token);
+					if (this.endSet.contains(curState)) {
+						tokenList.add(token);
+					}
+					else {
+						throw new NotEndException();
+					}
 				}
 			}
 			else {

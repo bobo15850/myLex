@@ -14,7 +14,7 @@ import common.Util;
 public class NFA {
 	private NFANode startNode;// 起始点
 	private NFANode endNode;// 结束点
-	private Set<Character> edgeWeightSet = new TreeSet<Character>();// 权重的集合
+	private Set<Character> charSet = new TreeSet<Character>();// 权重的集合
 	private Map<NFANode, ArrayList<NFAEdge>> linkTable = new TreeMap<NFANode, ArrayList<NFAEdge>>();// 邻接表
 
 	public NFA(char c1, char c2, Util.BinaryBasicOperator operator) throws NFAException {
@@ -39,8 +39,8 @@ public class NFA {
 	}// 以一个字符闭包的形式构造基础的NFA
 
 	private void createConnectNFA(char c1, char c2) {
-		this.edgeWeightSet.add(c1);
-		this.edgeWeightSet.add(c2);
+		this.charSet.add(c1);
+		this.charSet.add(c2);
 		// 初始化三个节点
 		this.startNode = new NFANode();
 		NFANode node = new NFANode();
@@ -62,8 +62,8 @@ public class NFA {
 	}// 以两个字符连接构造基础的NFA
 
 	private void createSelectNFA(char c1, char c2) {
-		this.edgeWeightSet.add(c1);
-		this.edgeWeightSet.add(c2);
+		this.charSet.add(c1);
+		this.charSet.add(c2);
 		// 初始化六个节点
 		this.startNode = new NFANode();
 		NFANode node1 = new NFANode();
@@ -102,7 +102,7 @@ public class NFA {
 	}// 以两个字符选择构造基础的NFA
 
 	private void createClosureNFA(char c) {
-		this.edgeWeightSet.add(c);
+		this.charSet.add(c);
 		// 初始化四个节点
 		this.startNode = new NFANode();
 		NFANode node1 = new NFANode();
@@ -133,7 +133,7 @@ public class NFA {
 	}// 以一个字符求闭包构造基础NFA
 
 	public void connectToChar(char c) {
-		this.edgeWeightSet.add(c);
+		this.charSet.add(c);
 		NFANode node = new NFANode();
 		NFAEdge node_start = new NFAEdge(c, this.startNode);
 		ArrayList<NFAEdge> nodeList = new ArrayList<NFAEdge>();
@@ -143,7 +143,7 @@ public class NFA {
 	}// 连接到一个字符之后,相当于添加一个起始点，该点有一条到原先起始点权重为c的边
 
 	public void connectedByChar(char c) {
-		this.edgeWeightSet.add(c);
+		this.charSet.add(c);
 		NFANode node = new NFANode();
 		NFAEdge end_node = new NFAEdge(c, node);
 		ArrayList<NFAEdge> nodeList = new ArrayList<NFAEdge>();
@@ -153,7 +153,7 @@ public class NFA {
 	}// 在之后连接一个字符,相当于添加一个终点，原来的终点有一条权重为c的边指向该点
 
 	public void connectToNFA(NFA NFA) {
-		this.edgeWeightSet.addAll(NFA.edgeWeightSet);
+		this.charSet.addAll(NFA.charSet);
 		NFAEdge NFAEnd_thisStart = new NFAEdge(Util.SpecialOperand.ε, this.startNode);
 		NFA.linkTable.get(NFA.endNode).add(NFAEnd_thisStart);
 		for (NFANode node : NFA.linkTable.keySet()) {
@@ -163,7 +163,7 @@ public class NFA {
 	}// 连接在一个NFA之后
 
 	public void connectedByNFA(NFA NFA) {
-		this.edgeWeightSet.addAll(NFA.edgeWeightSet);
+		this.charSet.addAll(NFA.charSet);
 		NFAEdge thisEnd_NFAStart = new NFAEdge(Util.SpecialOperand.ε, NFA.startNode);
 		this.linkTable.get(this.endNode).add(thisEnd_NFAStart);
 		for (NFANode node : NFA.linkTable.keySet()) {
@@ -173,7 +173,7 @@ public class NFA {
 	}// 之后连接一个NFA
 
 	public void selectChar(char c) {
-		this.edgeWeightSet.add(c);
+		this.charSet.add(c);
 		// 新建节点
 		NFANode node0 = new NFANode();
 		NFANode node1 = new NFANode();
@@ -207,7 +207,7 @@ public class NFA {
 	}// 与一个字符做选择
 
 	public void selectNFA(NFA NFA) {
-		this.edgeWeightSet.addAll(NFA.edgeWeightSet);
+		this.charSet.addAll(NFA.charSet);
 		NFANode node0 = new NFANode();
 		NFANode node1 = new NFANode();
 		//
@@ -259,8 +259,8 @@ public class NFA {
 		this.endNode = node2;
 	}// 将该NFA做一个闭包
 
-	public Set<Character> getEdgeWeightSet() {
-		return edgeWeightSet;
+	public Set<Character> getCharSet() {
+		return charSet;
 	}
 
 	public Map<NFANode, ArrayList<NFAEdge>> getLinkTable() {
@@ -319,6 +319,10 @@ public class NFA {
 		resSb.append(this.startNode).append(nextLine);
 		resSb.append("结束节点为：").append(nextLine);
 		resSb.append(this.endNode).append(nextLine);
+		resSb.append("字符集为：").append(nextLine);
+		for (char c : this.charSet) {
+			resSb.append(c).append(nextLine);
+		}
 		resSb.append("邻接表为：").append(nextLine);
 		for (NFANode node : this.linkTable.keySet()) {
 			ArrayList<NFAEdge> temp = this.linkTable.get(node);
