@@ -1,21 +1,26 @@
 package datastructure;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class DFA {
 	private DFANode startNode;// 开始节点
 	private Set<DFANode> endNodeSet = new TreeSet<DFANode>();// 终止节点集合
-	private Set<Character> edgeWeightSet = new TreeSet<Character>();// 所有转化因子的集合
+	private Set<Character> charSet = new TreeSet<Character>();// 所有转化因子的集合
 	private Map<DFANode, ArrayList<DFAEdge>> linkTable = new TreeMap<DFANode, ArrayList<DFAEdge>>();// 邻接表
+	private Set<Division> divisionSet = new HashSet<Division>();// 划分集合
 
 	public DFA(NFA nfa) {
-		this.edgeWeightSet = nfa.getEdgeWeightSet();// 得到所有的边上的值的集合
+		this.charSet = nfa.getEdgeWeightSet();// 得到所有的边上的值的集合
 		this.startNode = nfa.getStartNodeEpsilonClosure();// 得到开始节点
 		Queue<DFANode> queue = new LinkedList<DFANode>();
 		queue.add(startNode);
@@ -25,7 +30,7 @@ public class DFA {
 			if (nfa.isHasEndNFANode(dfaNode)) {
 				this.endNodeSet.add(dfaNode);
 			}// 判断是否为终结节点
-			for (char c : this.edgeWeightSet) {
+			for (char c : this.charSet) {
 				DFANode newDfaNode = nfa.gettargetDFANode(dfaNode, c);
 				if (newDfaNode != null) {
 					newDfaNode.ebsilonClosure(nfa);// 求闭包
@@ -40,9 +45,93 @@ public class DFA {
 		}
 	}// 由NFA构造DFA
 
-	public void minDFA() {
-		
+	public MinDFA getMinDFA() {
+		Division unacceptedDivison = new Division(endNodeSet);// 不可接受状态集
+		Set<DFANode> acceptedNodeSet = new HashSet<DFANode>();
+		for (DFANode node : this.linkTable.keySet()) {
+			if (!this.endNodeSet.contains(node)) {
+				acceptedNodeSet.add(node);
+			}
+		}
+		Division acceptedDivision = new Division(acceptedNodeSet);// 可接受状态集
+		Stack<Division> stack = new Stack<Division>();
+		this.divisionSet.add(acceptedDivision);
+		this.divisionSet.add(unacceptedDivison);
+		stack.push(unacceptedDivison);
+		stack.push(acceptedDivision);
+		while (!stack.isEmpty()) {
+			Division oldDivision = stack.pop();
+			la: for (char c : this.charSet) {
+				Set<Division> newDivisionSet = this.split(oldDivision, c);
+				if (newDivisionSet.size() > 1) {
+					this.divisionSet.remove(oldDivision);
+					this.divisionSet.addAll(newDivisionSet);
+					for (Division temp : newDivisionSet) {
+						stack.push(temp);
+					}
+					break la;
+				}// 可划分
+			}
+		}
+		Division startDivision = this.getDivisionOfNode(startNode);// 起始划分
+		Set<Division> endDivisionSet = new HashSet<Division>();// 终结划分集合
+		for (DFANode endNode : this.endNodeSet) {
+			endDivisionSet.add(this.getDivisionOfNode(endNode));
+		}
+		Map<Division, ArrayList<DivisionEdge>> minDFALinkTable = new Hashtable<Division, ArrayList<DivisionEdge>>();
+		for (Division division : this.divisionSet) {
+			ArrayList<DivisionEdge> linkEdge = new ArrayList<DivisionEdge>();
+			for (char c : this.charSet) {
+				Division targetDivision = this.getTargetDivision(division.getOneDFANode(), c);
+				if (targetDivision != null) {
+					linkEdge.add(new DivisionEdge(c, targetDivision));
+				}
+			}
+			minDFALinkTable.put(division, linkEdge);
+		}
+		return new MinDFA(startDivision, endDivisionSet, charSet, minDFALinkTable);
 	}
+
+	private Set<Division> split(Division oldDivision, char c) {
+		Map<Division, Set<DFANode>> map = new HashMap<Division, Set<DFANode>>();
+		Set<DFANode> dfaNodeSet = oldDivision.getDfaNodeSet();
+		for (DFANode node : dfaNodeSet) {
+			Division targetDivision = this.getTargetDivision(node, c);
+			if (map.containsKey(targetDivision)) {
+				map.get(targetDivision).add(node);
+			}
+			else {
+				Set<DFANode> set = new HashSet<DFANode>();
+				set.add(node);
+				map.put(targetDivision, set);
+			}
+		}
+		Set<Division> newDivisionSet = new HashSet<Division>();
+		for (Set<DFANode> nodeSet : map.values()) {
+			Division division = new Division(nodeSet);
+			newDivisionSet.add(division);
+		}
+		return newDivisionSet;
+	}// 将一个划分通过某个字符划分成多个
+
+	private Division getTargetDivision(DFANode dfaNode, char c) {
+		ArrayList<DFAEdge> linkEdge = this.linkTable.get(dfaNode);
+		for (int i = 0; i < linkEdge.size(); i++) {
+			if (linkEdge.get(i).getValue() == c) {
+				return this.getDivisionOfNode(linkEdge.get(i).getTargetNode());
+			}
+		}
+		return null;
+	}// 得到一个DFANode对于一个字符的转移划分
+
+	private Division getDivisionOfNode(DFANode dfaNode) {
+		for (Division division : this.divisionSet) {
+			if (division.hasDFANode(dfaNode)) {
+				return division;
+			}
+		}
+		return null;
+	}// 得到一个DFANode所在的划分
 
 	public String toString() {
 		StringBuilder resSb = new StringBuilder();
@@ -54,7 +143,7 @@ public class DFA {
 			resSb.append(node.toString()).append(nextLine);
 		}
 		resSb.append("所有的转换值如下：").append(nextLine);
-		for (char c : this.edgeWeightSet) {
+		for (char c : this.charSet) {
 			resSb.append(c).append(nextLine);
 		}
 		resSb.append("邻接表如下：").append(nextLine);
@@ -68,6 +157,10 @@ public class DFA {
 				}
 			}
 			resSb.append(nextLine);
+		}
+		resSb.append("划分如下：").append(nextLine);
+		for (Division division : this.divisionSet) {
+			resSb.append(division.toDetailString()).append(nextLine);
 		}
 		return resSb.toString();
 	}

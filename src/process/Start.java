@@ -2,6 +2,7 @@ package process;
 
 import common.NotFoundREsException;
 import datastructure.DFA;
+import datastructure.MinDFA;
 import datastructure.NFA;
 import datastructure.REFile;
 import datastructure.StandardRE;
@@ -17,7 +18,9 @@ public class Start {
 			NFA nfa = standardRE.getNFA();
 			System.out.println(nfa.toString());
 			DFA dfa = new DFA(nfa);
+			MinDFA minDFA = dfa.getMinDFA();
 			System.out.println(dfa.toString());
+			System.out.println(minDFA.toString());
 		} catch (NotFoundREsException e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());
