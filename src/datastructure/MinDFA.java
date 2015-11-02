@@ -2,8 +2,11 @@ package datastructure;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import common.UnknownCharException;
 
 public class MinDFA {
 	private final Division start;
@@ -40,5 +43,38 @@ public class MinDFA {
 			resSb.append(nextline);
 		}
 		return resSb.toString();
+	}
+
+	public List<String> getTokenList(String str) throws UnknownCharException {
+		Division curState = start;
+		List<String> tokenList = new ArrayList<String>();
+		String token = "";
+		for (int i = 0; i < str.length(); i++) {
+			if (this.charSet.contains(str.charAt(i))) {
+				ArrayList<DivisionEdge> linkEdge = this.linkTable.get(curState);
+				boolean hasNext = false;
+				for (DivisionEdge edge : linkEdge) {
+					if (edge.getWeight() == str.charAt(i)) {
+						token += str.charAt(i);
+						curState = edge.getTargetDivision();
+						hasNext = true;
+					}
+				}
+				if (!hasNext) {
+					tokenList.add(token);
+					token = "";
+					curState = start;
+					str = str.substring(i);
+					i = -1;
+				}
+				if (i == str.length() - 1) {
+					tokenList.add(token);
+				}
+			}
+			else {
+				throw new UnknownCharException();
+			}
+		}
+		return tokenList;
 	}
 }

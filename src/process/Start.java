@@ -1,6 +1,9 @@
 package process;
 
+import java.util.List;
+
 import common.NotFoundREsException;
+import common.UnknownCharException;
 import datastructure.DFA;
 import datastructure.MinDFA;
 import datastructure.NFA;
@@ -18,9 +21,20 @@ public class Start {
 			NFA nfa = standardRE.getNFA();
 			System.out.println(nfa.toString());
 			DFA dfa = new DFA(nfa);
-			MinDFA minDFA = dfa.getMinDFA();
 			System.out.println(dfa.toString());
+			MinDFA minDFA = dfa.getMinDFA();
+
 			System.out.println(minDFA.toString());
+			try {
+				List<String> tokenList = minDFA.getTokenList("bbaababaaababababaaaaab");
+				for (int i = 0; i < tokenList.size(); i++) {
+					System.out.println(tokenList.get(i));
+				}
+
+			} catch (UnknownCharException e) {
+				e.printStackTrace();
+				System.out.println(e.getMessage());
+			}
 		} catch (NotFoundREsException e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());
