@@ -13,7 +13,7 @@ import datastructure.StandardRE;
 
 public class Start {
 	public static void main(String[] args) {
-		String path = "D:/study/javaÎÄ¼þ/myLex/files/REs.txt";
+		String path = "files/REs.l";
 		REFile handler = new REFile(path);
 		String targetRE = handler.getTargetRE();
 		System.out.println(targetRE);
@@ -26,7 +26,8 @@ public class Start {
 			System.out.println(dfa.toString());
 			System.out.println(minDFA.toString());
 			try {
-				List<String> tokenList = minDFA.getTokenList("bbaababbaaababababaaaaab");
+				List<String> tokenList = minDFA
+						.getTokenList("public static s = dgfdg;s=asd;s=dfg;int i=23;for [int i=100;i>0;i--]{cout>>sdd;}");
 				for (int i = 0; i < tokenList.size(); i++) {
 					System.out.println(tokenList.get(i));
 				}
