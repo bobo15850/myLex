@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
+import common.NotFoundREsException;
 import common.Util;
 
 public class REFile {
@@ -16,15 +18,21 @@ public class REFile {
 		this.REsPath = REsPath;
 	}
 
-	public String getTargetRE() {
+	public StandardRE getStandardRE() {
 		StringBuilder builder = new StringBuilder();
 		List<String> REs = this.getBasicREs();
 		if (REs.size() > 0) {
 			builder.append(Util.Pair.left).append(REs.get(0)).append(Util.Pair.right);
 			for (int i = 1; i < REs.size(); i++) {
-				builder.append(Util.BasicOperator.select).append(Util.Pair.left).append(REs.get(i)).append(Util.Pair.right);
+				builder.append(Util.BasicOperator.select).append(Util.Pair.left).append(REs.get(i))
+						.append(Util.Pair.right);
 			}
-			return builder.toString();
+			try {
+				return new StandardRE(builder.toString());
+			} catch (NotFoundREsException e) {
+				e.printStackTrace();
+				return null;
+			}
 		}
 		return null;
 	}// 将所有的分开的正则表达式用|符号做选择，合并成一个总的正则表达式
@@ -125,7 +133,8 @@ public class REFile {
 		int start = this.getStartOfOperand(originalRE, position);
 		String before = originalRE.substring(0, start);
 		String target = originalRE.substring(start, position);// 正闭包操作数
-		target = Util.Pair.left + target + Util.BasicOperator.connect + target + Util.BasicOperator.closure + Util.Pair.right;// r+=(rr*)
+		target = Util.Pair.left + target + Util.BasicOperator.connect + target + Util.BasicOperator.closure
+				+ Util.Pair.right;// r+=(rr*)
 		String after = originalRE.substring(position + 1);
 		String newRE = before + target + after;// 将正闭包去除后的正则表达式
 		return newRE;

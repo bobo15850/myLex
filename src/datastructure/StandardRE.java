@@ -22,7 +22,7 @@ public class StandardRE {
 		return nfa;
 	}// 得到NFA
 
-	public String inOrderToPosOrder() {
+	private String inOrderToPosOrder() {
 		Stack<Character> stack = new Stack<Character>();// 栈用以存放暂时取得的但是不做处理的操作数
 		StringBuilder builder = new StringBuilder();// 后续的正则表达
 		for (int i = 0; i < this.RE.length(); i++) {
@@ -47,7 +47,8 @@ public class StandardRE {
 					stack.push(ch);
 				}// 遇到连接时将栈中的连接符全部弹出，直到遇到（，|然后再将该连接符压入栈
 				else if (ch == Util.BasicOperator.select) {
-					while (!stack.empty() && (stack.peek() == Util.BasicOperator.connect || stack.peek() == Util.BasicOperator.select)) {
+					while (!stack.empty()
+							&& (stack.peek() == Util.BasicOperator.connect || stack.peek() == Util.BasicOperator.select)) {
 						builder.append(stack.pop());
 					}
 					stack.push(ch);
