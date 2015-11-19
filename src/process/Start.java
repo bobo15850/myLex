@@ -1,5 +1,10 @@
 package process;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 
 import common.NotEndException;
@@ -26,17 +31,26 @@ public class Start {
 			System.out.println(dfa.toString());
 			System.out.println(minDFA.toString());
 			try {
-				List<String> tokenList = minDFA
-						.getTokenList("public static s = dgfdg;s=asd;s=dfg;int i=23;for [int i=100;i>0;i--]{cout>>sdd;}");
-				for (int i = 0; i < tokenList.size(); i++) {
-					System.out.println(tokenList.get(i));
+				File inputFile = new File("files/input.txt");
+				BufferedReader br = new BufferedReader(new FileReader(inputFile));
+				String temp = null;
+				while ((temp = br.readLine()) != null) {
+					List<String> tokenList = minDFA.getTokenList(temp);
+					for (int i = 0; i < tokenList.size(); i++) {
+						System.out.println(tokenList.get(i));
+					}
 				}
+				br.close();
 			} catch (UnknownCharException e) {
 				e.printStackTrace();
 				System.out.println(e.getMessage());
 			} catch (NotEndException e) {
 				e.printStackTrace();
 				System.out.println(e.getMessage());
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		} catch (NotFoundREsException e) {
 			e.printStackTrace();

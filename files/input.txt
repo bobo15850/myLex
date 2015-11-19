@@ -1,0 +1,7 @@
+public static s = dgfdg;
+s=asd;
+s=dfg;
+int i=23;
+for [int i=100;i>0;i--]{
+cout>>sdd;
+}
